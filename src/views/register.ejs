@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  </head>
+
+  <script>
+    $(document).ready(function () {
+      const username = $("#username");
+      const email = $("#email");
+      const password = $("#password");
+      const confirmationCode = $("#confirmation-code");
+      const gender = $("#gender");
+      const btnSendCode = $("#btn-send-code");
+      const btnRegister = $("#btn-register");
+      const liveToast = $("#liveToast");
+      const btnCloseToast = $("#btn-close-toast");
+      const toastBody = $("#toast-body");
+
+      function resetRemoveInvalid(element) {
+        element.hasClass("is-invalid") && element.removeClass("is-invalid");
+      }
+
+      function checkValidInputs() {
+        let check = true;
+        if (!username.val()) {
+          username.addClass("is-invalid");
+          check = false;
+        }
+
+        if (!email.val()) {
+          email.addClass("is-invalid");
+          check = false;
+        }
+
+        if (!password.val()) {
+          password.addClass("is-invalid");
+          check = false;
+        }
+
+        if (!confirmationCode.val()) {
+          confirmationCode.addClass("is-invalid");
+          check = false;
+        }
+
+        return check;
+      }
+
+      // làm mới input
+      username.on("input", () => resetRemoveInvalid(username));
+      email.on("input", () => resetRemoveInvalid(email));
+      password.on("input", () => resetRemoveInvalid(password));
+      confirmationCode.on("input", () => resetRemoveInvalid(confirmationCode));
+
+      // close toast
+      btnCloseToast.on("click", function () {
+        liveToast.removeClass("show");
+        liveToast.addClass("hide");
+      });
+
+      btnSendCode.on("click", function () {
+        if (!email.val()) {
+          email.addClass("is-invalid");
+          return;
+        }
+
+        btnSendCode.prop("disabled", true);
+
+        const data = {
+          email: email.val(),
+        };
+
+        $.ajax({
+          type: "POST",
+          url: `${window.location.origin}/verification-code`,
+          data: data,
+          withCredentials: true,
+          success: function (data) {
+            liveToast.removeClass("hide");
+            liveToast.addClass("show");
+            btnSendCode.prop("disabled", false);
+            toastBody.text(data.EM);
+          },
+          error: function (request, status, error) {
+            btnSendCode.prop("disabled", false);
+            liveToast.removeClass("hide");
+            liveToast.addClass("show");
+            toastBody.text(data.EM);
+            console.log(error);
+          },
+        });
+      });
+
+      btnRegister.on("click", function () {
+        const isCheckValid = checkValidInputs();
+
+        if (isCheckValid) {
+          const data = {
+            email: email.val(),
+            username: username.val(),
+            password: password.val(),
+            gender: gender.val(),
+            code: confirmationCode.val(),
+          };
+
+          $.ajax({
+            type: "POST",
+            url: `${window.location.origin}/register`,
+            data: data,
+            withCredentials: true,
+            success: function (data) {
+              liveToast.removeClass("hide");
+              liveToast.addClass("show");
+              toastBody.text(data.EM);
+              window.location.href = `${window.location.origin}/login`
+            },
+            error: function (request, status, error) {
+              console.log(error);
+              liveToast.removeClass("hide");
+              liveToast.addClass("show");
+              toastBody.text(data.EM);
+            },
+          });
+        }
+      });
+    });
+  </script>
+
+  <body
+    style="
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    "
+  >
+    <div class="container">
+      <div class="row">
+        <fieldset class="border rounded-3 p-3">
+          <legend class="float-none w-auto px-3">Đăng ký</legend>
+          <form>
+            <div class="row">
+              <div class="mb-3 col-12 col-md-6">
+                <label class="form-label">Tên người dùng</label>
+                <input id="username" type="email" class="form-control" />
+              </div>
+              <div class="mb-3 col-12 col-md-6">
+                <label class="form-label">Địa chỉ email</label>
+                <input id="email" type="email" class="form-control" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="mb-3 col-12 col-md-6">
+                <label class="form-label">Mật khẩu</label>
+                <input id="password" type="password" class="form-control" />
+              </div>
+              <div class="mb-3 col-12 col-md-2">
+                <label class="form-label">Giới tính</label>
+                <select id="gender" class="form-select">
+                  <option selected value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                </select>
+              </div>
+              <div class="mb-3 col-6 col-md-2">
+                <label class="form-label">Mã xác nhận</label>
+                <input
+                  id="confirmation-code"
+                  type="text"
+                  class="form-control"
+                  size="6"
+                  maxlength="6"
+                />
+              </div>
+              <div class="mb-3 col-6 col-md-2">
+                <button
+                  id="btn-send-code"
+                  style="margin-top: 32px"
+                  class="btn btn-success"
+                  type="button"
+                >
+                  Gữi mã
+                </button>
+              </div>
+            </div>
+            <button id="btn-register" type="button" class="btn btn-primary">
+              Đăng ký
+            </button>
+            <hr />
+            <div class="text-center">
+              <span>Đã có tài khoản? </span>
+              <a href="/login" style="text-decoration: none">Đăng nhập</a>
+            </div>
+          </form>
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+      <div
+        id="liveToast"
+        class="toast hide"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="toast-header">
+          <strong class="me-auto">Thông báo!</strong>
+          <small>Vừa xong</small>
+          <button
+            id="btn-close-toast"
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="toast-body" id="toast-body"></div>
+      </div>
+    </div>
+  </body>
+</html>
