@@ -15,8 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   VerificationCodes.init({
     email: DataTypes.STRING,
-    code: DataTypes.STRING,
-    isUse: DataTypes.BOOLEAN
+    code: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'VerificationCodes',

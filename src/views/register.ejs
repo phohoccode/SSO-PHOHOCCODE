@@ -98,13 +98,16 @@
             liveToast.addClass("show");
             btnSendCode.prop("disabled", false);
             toastBody.text(data.EM);
+            setTimeout(() => {
+              liveToast.removeClass("show");
+              liveToast.addClass("hide");
+            }, 3000);
           },
           error: function (request, status, error) {
             btnSendCode.prop("disabled", false);
             liveToast.removeClass("hide");
             liveToast.addClass("show");
-            toastBody.text(data.EM);
-            console.log(error);
+            toastBody.text(error);
           },
         });
       });
@@ -127,10 +130,10 @@
             data: data,
             withCredentials: true,
             success: function (data) {
-              liveToast.removeClass("hide");
-              liveToast.addClass("show");
-              toastBody.text(data.EM);
-              window.location.href = `${window.location.origin}/login`
+              console.log(data);
+              if (+data.EC === 0) {
+                window.location.href = `${window.location.origin}/login`;
+              }
             },
             error: function (request, status, error) {
               console.log(error);
@@ -196,7 +199,7 @@
                   class="btn btn-success"
                   type="button"
                 >
-                  Gữi mã
+                  Gửi mã
                 </button>
               </div>
             </div>

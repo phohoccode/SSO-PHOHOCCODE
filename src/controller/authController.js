@@ -5,7 +5,6 @@ const handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
 
-
 const getPageLogin = (req, res) => {
     return res.render('login.ejs')
 }
@@ -16,7 +15,14 @@ const getPageRegister = (req, res) => {
 
 const login = async (req, res) => {
     try {
+      
+        const data = await authService.handleLogin(req.body)
 
+        return res.status(200).json({
+            EC: data.EC,
+            EM: data.EM,
+            DT: data.DT
+        })
     } catch (error) {
         console.log(error)
         return res.status(500).json({
@@ -26,10 +32,9 @@ const login = async (req, res) => {
     }
 }
 
-
 const register = async (req, res) => {
     try {
-        console.log('>>> register:', req.body)
+
         const data = await authService.handleRegister(req.body)
 
         return res.status(200).json({
@@ -85,20 +90,9 @@ const verifycationCode = async (req, res) => {
 
             await authService.handleVerificationCode(req.body.email, OTP)
 
-            // await Promise.all([
-            //     transporter.sendMail({
-            //         from: `phohoccode <${process.env.GOOGLE_APP_EMAIL}>`,
-            //         to: `${req.body.email}`,
-            //         subject: "Xác minh tài khoản",
-            //         text: "phohoccode",
-            //         html: htmlToSend
-            //     }),
-            //     authService.handleVerificationCode(req.body.email, OTP)
-            // ])
-
             return res.status(200).json({
                 EC: 0,
-                EM: 'Đã gửi mã xác nhận.Vui lòng kiểm tra email của bạn!'
+                EM: 'Đã gửi mã xác nhận. Vui lòng kiểm tra email của bạn!'
             })
         } catch (error) {
             console.log(error);

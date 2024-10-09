@@ -22,7 +22,71 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   </head>
 
-  <script></script>
+  <script>
+    $(document).ready(function () {
+      const username = $("#username");
+      const password = $("#password");
+      const btnLogin = $("#btn-login");
+      const liveToast = $("#liveToast");
+      const btnCloseToast = $("#btn-close-toast");
+      const toastBody = $("#toast-body");
+
+      function resetRemoveInvalid(element) {
+        element.hasClass("is-invalid") && element.removeClass("is-invalid");
+      }
+
+      function checkValidInputs() {
+        let check = true;
+
+        if (!username.val()) {
+          username.addClass("is-invalid");
+          check = false;
+        }
+
+        if (!password.val()) {
+          password.addClass("is-invalid");
+          check = false;
+        }
+
+        return check;
+      }
+
+      username.on("input", () => resetRemoveInvalid(username));
+      password.on("input", () => resetRemoveInvalid(password));
+
+      btnLogin.on("click", function () {
+        const isCheckValid = checkValidInputs();
+
+        if (isCheckValid) {
+          const data = {
+            username: username.val(),
+            password: password.val(),
+          };
+
+          $.ajax({
+            type: "POST",
+            url: `${window.location.origin}/login`,
+            data: data,
+            withCredentials: true,
+            success: function (data) {
+              if (data.email) {
+                window.location.href = "/";
+              }
+            },
+            error: function (request, status, error) {
+              liveToast.removeClass("hide");
+              liveToast.addClass("show");
+              toastBody.text(request.responseJSON.message);
+              setTimeout(() => {
+                liveToast.removeClass("show");
+                liveToast.addClass("hide");
+              }, 3000);
+            },
+          });
+        }
+      });
+    });
+  </script>
 
   <body
     style="
@@ -38,11 +102,11 @@
           <legend class="float-none w-auto px-3">Đăng nhập</legend>
           <form>
             <div class="row">
-              <div class="mb-3 col-6">
-                <label class="form-label">Địa chỉ email</label>
-                <input id="email" type="email" class="form-control" />
+              <div class="mb-3 col-12 col-md-6">
+                <label class="form-label">Email/Số điện thoại</label>
+                <input id="username" type="username" class="form-control" />
               </div>
-              <div class="mb-3 col-6">
+              <div class="mb-3 col-12 col-md-6">
                 <label class="form-label">Mật khẩu</label>
                 <input id="password" type="password" class="form-control" />
               </div>
@@ -53,7 +117,7 @@
               >
             </div>
 
-            <button id="btn-register" type="button" class="btn btn-success">
+            <button id="btn-login" type="button" class="btn btn-success">
               Đăng nhập
             </button>
 
@@ -78,6 +142,29 @@
             </div>
           </form>
         </fieldset>
+      </div>
+    </div>
+
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+      <div
+        id="liveToast"
+        class="toast hide"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="toast-header">
+          <strong class="me-auto">Thông báo!</strong>
+          <small>Vừa xong</small>
+          <button
+            id="btn-close-toast"
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="toast-body" id="toast-body"></div>
       </div>
     </div>
   </body>

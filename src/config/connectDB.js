@@ -9,12 +9,13 @@ const sequelize = new Sequelize(
     dialect: process.env.DB_DIALECT
 })
 
+// kiểm tra kết nối
 const connection = async () => {
     try {
         await sequelize.authenticate();
         console.log('Kết nối database thành công!');
     } catch (error) {
-        console.error('Unable to connect to the database:', error);
+        console.error('Kết nối database thất bại!', error);
     }
 }
 

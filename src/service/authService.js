@@ -1,5 +1,7 @@
+const { Op } = require('sequelize');
 const db = require('../models/index')
 const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -11,13 +13,25 @@ const checkPassword = (password, hashPassword) => {
     return bcrypt.compareSync(password, hashPassword)
 }
 
+const checkExistEmail = async (email) => {
+    try {
+
+    } catch (error) {
+        console.log(error)
+        return {
+            EC: -1,
+            EM: 'Lỗi không xác định!'
+        }
+    }
+}
+
 const handleVerificationCode = async (email, code) => {
     try {
 
         await db.VerificationCodes.destroy({
             where: { email: email }
         })
-        
+
         await db.VerificationCodes.create({
             email: email,
             code: code,
@@ -33,7 +47,55 @@ const handleVerificationCode = async (email, code) => {
 }
 
 const handleLogin = async (rawData) => {
+    try {
+        const user = await db.Users.findOne({
+            where: {
+                [Op.or]: [
+                    { email: rawData.username },
+                    { phoneNumber: rawData.username }
+                ],
+                type: 'LOCAL'
+            },
+            raw: true
+        })
 
+        console.log(user)
+
+        if (!user) {
+            return {
+                EC: -1,
+                EM: 'Tài khoản hoặc mật khẩu không chính xác!'
+            }
+        }
+
+        const isCorrectPassword = checkPassword(rawData.password, user.password)
+
+        if (!isCorrectPassword) {
+            return {
+                EC: -1,
+                EM: 'Mật khẩu không chính xác!'
+            }
+        }
+
+        return {
+            EC: 0,
+            EM: 'Đăng nhập thành công!',
+            DT: {
+                username: user.username,
+                email: user.email,
+                address: user.address,
+                phoneNumber: user.phoneNumber,
+                gender: user.gender,
+                code: uuidv4()
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            EC: -1,
+            EM: 'Lỗi không xác định!'
+        }
+    }
 }
 
 const handleRegister = async (rawData) => {
@@ -65,14 +127,7 @@ const handleRegister = async (rawData) => {
             }
         }
 
-        if (user.isUse) {
-            return {
-                EC: -1,
-                EM: 'Mã đã được sử dụng!',
-            }
-        }
-
-        const hashPassword = hashUserPassword(rawData.password)
+        const hashPassword = hashUserPassword(rawData.password, salt)
 
         await db.Users.create({
             username: rawData.username,
