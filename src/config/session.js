@@ -27,13 +27,17 @@ const configSession = (app) => {
 
     // Thiết lập middleware express-session:
     app.use(session({
-        secret: "keyboard cat",
+        secret: process.env.SESSION_SECRET,
         store: myStore,
         resave: false,
         proxy: true,
         saveUninitialized: false,
-        expiration: 300 * 1000,
-        cookie: { expires: 300 * 1000 }
+        expiration: 360,
+        cookie: {
+            maxAge: 300 * 1000,
+            httpOnly: true,
+            sameSite: 'lax'
+        }
     }));
 
     // tạo bảng sesstion trong db

@@ -5,13 +5,12 @@ const authService = require('../service/authService')
 const configPassport = () => {
     passport.use(new LocalStrategy(
         async function (username, password, done) {
+            const response = await authService.handleLogin({ username, password })
 
-            const res = await authService.handleLogin({ username, password })
-
-            if (res && +res.EC === 0) {
-                return done(null, res.DT);
+            if (response && +response.EC === 0) {
+                return done(null, response.DT, response.EM);
             } else {
-                return done(null, false);
+                return done(null, false, response.EM);
             }
         }
     ));
@@ -25,7 +24,7 @@ const handleLogin = (req, res, next) => {
 
         if (!user) {
             return res.status(401).json({
-                message: 'Tài khoản hoặc mật khẩu không đúng!'
+                message: info
             });
         }
 
@@ -35,7 +34,7 @@ const handleLogin = (req, res, next) => {
             return res.status(200).json(user)
         })
 
-    })(req, res, next) // vào hàm configPassport
+    })(req, res, next) 
 }
 
 const handleLogout = (req, res, next) => {

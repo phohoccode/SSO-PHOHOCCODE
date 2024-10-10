@@ -21,7 +21,6 @@
   <script>
     $(document).ready(function () {
       $("#btn-logout").on("click", function () {
-        console.log( `${window.location.origin}/logout`);
         
         $.ajax({
           type: "POST",

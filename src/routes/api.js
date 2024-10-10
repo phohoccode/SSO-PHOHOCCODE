@@ -1,15 +1,17 @@
 const express = require('express')
+const authController = require('../controller/authController')
+const { verifyJWT } = require('../middleware/JWTActions')
+const JWTController = require("../controller/JWTController")
 
 const route = express.Router()
 
 const initApiRoutes = (app) => {
-    route.get('/hello-world', (req, res) => {
-        return res.json({
-            message: 'Hello world'
-        })
-    })
+    route.all('*', verifyJWT)
 
-    return app.use('/', route)
+    route.get('/logout', authController.logout)
+    route.get('/account', JWTController.getAccount)
+
+    return app.use('/api/v1', route)
 }
 
 module.exports = initApiRoutes

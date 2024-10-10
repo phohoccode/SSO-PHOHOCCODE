@@ -15,8 +15,8 @@ module.exports = {
       code: {
         type: Sequelize.STRING
       },
-      isUse: {
-        type: Sequelize.BOOLEAN
+      type: {
+          type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

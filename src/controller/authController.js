@@ -6,7 +6,8 @@ const fs = require('fs');
 const path = require('path');
 
 const getPageLogin = (req, res) => {
-    return res.render('login.ejs')
+    const redirectURL = req.query.redirectURL
+    return res.render('login.ejs', { redirectURL })
 }
 
 const getPageRegister = (req, res) => {
@@ -15,7 +16,7 @@ const getPageRegister = (req, res) => {
 
 const login = async (req, res) => {
     try {
-      
+
         const data = await authService.handleLogin(req.body)
 
         return res.status(200).json({
@@ -50,7 +51,7 @@ const register = async (req, res) => {
     }
 }
 
-const verifycationCode = async (req, res) => {
+const sendOTP = async (req, res) => {
     try {
         const OTP = Math.floor(100000 + Math.random() * 900000)
 
@@ -80,6 +81,7 @@ const verifycationCode = async (req, res) => {
         });
 
         try {
+
             await transporter.sendMail({
                 from: `phohoccode <${process.env.GOOGLE_APP_EMAIL}>`,
                 to: `${req.body.email}`,
@@ -88,7 +90,7 @@ const verifycationCode = async (req, res) => {
                 html: htmlToSend
             });
 
-            await authService.handleVerificationCode(req.body.email, OTP)
+            await authService.insertCodeToDB(req.body.email, OTP, req.body.type)
 
             return res.status(200).json({
                 EC: 0,
@@ -110,10 +112,51 @@ const verifycationCode = async (req, res) => {
     }
 }
 
+const logout = (req, res, next) => {
+    try {
+        res.clearCookie("refresh_token");
+        res.clearCookie("access_token");
+        req.logout(function (err) {
+            if (err) { return next(err); }
+            res.redirect('/');
+        });
+        return res.status(200).json({
+            mesage: 'Đăng xuất thành công!'
+        })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            EC: -1,
+            EM: 'Lỗi không xác định!'
+        })
+    }
+}
+
+const forgotPassword = async (req, res, next) => {
+    try {
+        const data = await authService.handleResetPassword(req.body)
+
+
+        return res.status(200).json({
+            EC: data.EC,
+            EM: data.EM,
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            EC: -1,
+            EM: 'Lỗi không xác định!'
+        })
+    }
+}
+
 module.exports = {
     getPageLogin,
     getPageRegister,
     login,
+    logout,
     register,
-    verifycationCode
+    sendOTP,
+    forgotPassword
 }

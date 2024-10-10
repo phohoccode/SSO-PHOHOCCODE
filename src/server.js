@@ -8,7 +8,7 @@ const configViewEngine = require('./config/viewEngine')
 const initApiRoutes = require('./routes/api')
 const initWebRoutes = require('./routes/web')
 const { configPassport } = require('./controller/passportController')
-const configSession = require('./config/configSession')
+const configSession = require('./config/session')
 
 const app = express()
 const PORT = process.env.PORT || 8888

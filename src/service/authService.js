@@ -13,9 +13,13 @@ const checkPassword = (password, hashPassword) => {
     return bcrypt.compareSync(password, hashPassword)
 }
 
-const checkExistEmail = async (email) => {
+const checkExistEmail = async (emailUser) => {
     try {
+        const email = await db.Users.findOne({
+            where: { email: emailUser }
+        })
 
+        return email ? true : false
     } catch (error) {
         console.log(error)
         return {
@@ -25,17 +29,17 @@ const checkExistEmail = async (email) => {
     }
 }
 
-const handleVerificationCode = async (email, code) => {
+const insertCodeToDB = async (email, code, type) => {
     try {
 
         await db.VerificationCodes.destroy({
-            where: { email: email }
+            where: { email: email, type: type }
         })
 
         await db.VerificationCodes.create({
             email: email,
             code: code,
-            isUse: false
+            type: type
         })
     } catch (error) {
         console.log(error)
@@ -59,8 +63,6 @@ const handleLogin = async (rawData) => {
             raw: true
         })
 
-        console.log(user)
-
         if (!user) {
             return {
                 EC: -1,
@@ -74,6 +76,13 @@ const handleLogin = async (rawData) => {
             return {
                 EC: -1,
                 EM: 'Mật khẩu không chính xác!'
+            }
+        }
+
+        if (+user.isLock === 1) {
+            return {
+                EC: -1,
+                EM: 'Tài khoản đã bị khoá!'
             }
         }
 
@@ -100,12 +109,10 @@ const handleLogin = async (rawData) => {
 
 const handleRegister = async (rawData) => {
     try {
-
         const email = await db.Users.findOne({
             where: { email: rawData.email },
             raw: true
         })
-
 
         if (email) {
             return {
@@ -115,7 +122,7 @@ const handleRegister = async (rawData) => {
         }
 
         const user = await db.VerificationCodes.findOne({
-            where: { email: rawData.email },
+            where: { email: rawData.email, type: rawData.type },
             raw: true
         })
 
@@ -153,8 +160,56 @@ const handleRegister = async (rawData) => {
     }
 }
 
+const handleResetPassword = async (rawData) => {
+    try {
+        const isEmailExist = await checkExistEmail(rawData.email)
+
+        console.log('>>> isEmailExist', isEmailExist)
+
+        if (!isEmailExist) {
+            return {
+                EC: -1,
+                EM: 'Địa chỉ email không tồn tại!'
+            }
+        }
+
+        const user = await db.VerificationCodes.findOne({
+            where: { email: rawData.email, type: rawData.type },
+            raw: true
+        })
+
+
+        if (!user || user.code !== rawData.code) {
+            return {
+                EC: -1,
+                EM: 'Mã xác nhận không chính xác!',
+            }
+        }
+
+        const hashPassword = hashUserPassword(rawData.password)
+
+        await db.Users.update(
+            { password: hashPassword },
+            { where: {email: rawData.email} }
+        )
+
+        return {
+            EC: 0,
+            EM: 'Thay đổi mật khẩu thành công!'
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            EC: -1,
+            EM: 'Lỗi không xác định!'
+        }
+    }
+}
+
 module.exports = {
     handleLogin,
     handleRegister,
-    handleVerificationCode
+    insertCodeToDB,
+    checkExistEmail,
+    handleResetPassword
 }
