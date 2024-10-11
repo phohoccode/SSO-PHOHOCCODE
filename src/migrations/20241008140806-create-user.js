@@ -27,6 +27,9 @@ module.exports = {
             type: {
                 type: Sequelize.STRING
             },
+            refreshToken: {
+                type: Sequelize.STRING
+            },
             isLock: {
                 type: Sequelize.INTEGER
             },

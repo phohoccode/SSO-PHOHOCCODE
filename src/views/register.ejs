@@ -31,9 +31,11 @@
       const gender = $("#gender");
       const btnSendCode = $("#btn-send-code");
       const btnRegister = $("#btn-register");
-      const liveToast = $("#liveToast");
-      const btnCloseToast = $("#btn-close-toast");
       const toastBody = $("#toast-body");
+      const toast = new bootstrap.Toast($(".toast"), {
+        animation: true,
+        autohide: true,
+      });
 
       function resetRemoveInvalid(element) {
         element.hasClass("is-invalid") && element.removeClass("is-invalid");
@@ -70,12 +72,6 @@
       password.on("input", () => resetRemoveInvalid(password));
       confirmationCode.on("input", () => resetRemoveInvalid(confirmationCode));
 
-      // close toast
-      btnCloseToast.on("click", function () {
-        liveToast.removeClass("show");
-        liveToast.addClass("hide");
-      });
-
       btnSendCode.on("click", function () {
         if (!email.val()) {
           email.addClass("is-invalid");
@@ -86,7 +82,7 @@
 
         const data = {
           email: email.val(),
-          type: 'REGISTER'
+          type: "REGISTER",
         };
 
         $.ajax({
@@ -95,19 +91,13 @@
           data: data,
           withCredentials: true,
           success: function (data) {
-            liveToast.removeClass("hide");
-            liveToast.addClass("show");
             btnSendCode.prop("disabled", false);
             toastBody.text(data.EM);
-            setTimeout(() => {
-              liveToast.removeClass("show");
-              liveToast.addClass("hide");
-            }, 3000);
+            toast.show();
           },
           error: function (request, status, error) {
             btnSendCode.prop("disabled", false);
-            liveToast.removeClass("hide");
-            liveToast.addClass("show");
+            toast.show();
             toastBody.text(error);
           },
         });
@@ -123,7 +113,7 @@
             password: password.val(),
             gender: gender.val(),
             code: confirmationCode.val(),
-            type: 'REGISTER'
+            type: "REGISTER",
           };
 
           $.ajax({
@@ -139,8 +129,7 @@
             },
             error: function (request, status, error) {
               console.log(error);
-              liveToast.removeClass("hide");
-              liveToast.addClass("show");
+              toast.show();
               toastBody.text(data.EM);
             },
           });
@@ -155,6 +144,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      padding: 24px;
     "
   >
     <div style="max-width: 640px">
@@ -184,7 +174,7 @@
                   <option value="Nữ">Nữ</option>
                 </select>
               </div>
-              <div class="mb-3 col-3">
+              <div class="mb-3 col-4">
                 <label class="form-label">Mã xác nhận</label>
                 <input
                   id="confirmation-code"
@@ -194,7 +184,7 @@
                   maxlength="6"
                 />
               </div>
-              <div class="mb-3 col-3">
+              <div class="mb-3 col-4">
                 <button
                   id="btn-send-code"
                   style="margin-top: 32px"
@@ -205,7 +195,11 @@
                 </button>
               </div>
             </div>
-            <button id="btn-register" type="button" class="btn btn-success w-100 mt-3">
+            <button
+              id="btn-register"
+              type="button"
+              class="btn btn-success w-100 mt-3"
+            >
               Đăng ký
             </button>
             <hr />

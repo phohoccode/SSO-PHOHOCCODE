@@ -27,20 +27,26 @@
       const username = $("#username");
       const password = $("#password");
       const btnLogin = $("#btn-login");
-      const liveToast = $("#liveToast");
+      //   const liveToast = $("#liveToast");
       const btnCloseToast = $("#btn-close-toast");
       const toastBody = $("#toast-body");
       const redirectURL = $("#redirectURL").val();
       const forgotPassword = $("#forgot-password");
-      const modalForgotPassword = $("#modal-forgot-password");
-      const btnCloseModal = $("#btn-close-modal");
-      const btnCanceModal = $("#btn-cancel-modal");
-      const btnSubmitModal = $("#btn-submit-modal");
-      const btnSendCode = $('#btn-send-code')
-      const emailModal = $('#email-modal')
-      const passwordModal = $('#password-modal')
-      const newPasswordModal = $('#new-password-modal')
-      const confirmCode = $('#confirmation-code')
+      const btnChangePassword = $("#btn-submit-modal");
+      const btnSendCode = $("#btn-send-code");
+      const emailModal = $("#email-modal");
+      const passwordModal = $("#password-modal");
+      const newPasswordModal = $("#new-password-modal");
+      const confirmCode = $("#confirmation-code");
+      const btnLoginGoogle = $("#btn-login-google");
+      const btnLoginFacebook = $("#btn-login-facebook");
+      const btnLoginGithub = $("#btn-login-github");
+      const btnLoginDiscord = $("#btn-login-discord");
+      const modalForgotPassword = new bootstrap.Modal($("#modal"));
+      const toast = new bootstrap.Toast($(".toast"), {
+        animation: true,
+        autohide: true,
+      });
 
       function resetRemoveInvalid(element) {
         element.hasClass("is-invalid") && element.removeClass("is-invalid");
@@ -70,24 +76,13 @@
       username.on("input", () => resetRemoveInvalid(username));
       password.on("input", () => resetRemoveInvalid(password));
 
-      btnCloseToast.on("click", function () {
-        showHideElement(liveToast, "hide", "show");
-      });
-
       forgotPassword.on("click", function () {
-        showHideElement(modalForgotPassword, "show", "");
-        modalForgotPassword.css("display", "block");
+        modalForgotPassword.show();
       });
 
-      btnCanceModal.on("click", function () {
-        showHideElement(modalForgotPassword, "", "show");
-        modalForgotPassword.css("display", "none");
-      });
-
-      btnCloseModal.on("click", function () {
-        showHideElement(modalForgotPassword, "", "show");
-        modalForgotPassword.css("display", "none");
-      });
+      emailModal.on("input", () => resetRemoveInvalid(emailModal));
+      newPasswordModal.on("input", () => resetRemoveInvalid(newPasswordModal));
+      confirmCode.on("input", () => resetRemoveInvalid(confirmCode));
 
       btnSendCode.on("click", function () {
         if (!emailModal.val()) {
@@ -99,7 +94,7 @@
 
         const data = {
           email: emailModal.val(),
-          type: 'FORGOT-PASSWORD'
+          type: "FORGOT-PASSWORD",
         };
 
         $.ajax({
@@ -108,55 +103,64 @@
           data: data,
           withCredentials: true,
           success: function (data) {
-            liveToast.removeClass("hide");
-            liveToast.addClass("show");
+            toast.show();
             btnSendCode.prop("disabled", false);
             toastBody.text(data.EM);
-            setTimeout(() => {
-              liveToast.removeClass("show");
-              liveToast.addClass("hide");
-            }, 3000);
           },
           error: function (request, status, error) {
             btnSendCode.prop("disabled", false);
-            liveToast.removeClass("hide");
-            liveToast.addClass("show");
             toastBody.text(error);
           },
         });
       });
 
-      btnSubmitModal.on('click', function() {
-        const data = {
+      btnChangePassword.on("click", function () {
+        let check = true;
+
+        if (!emailModal.val()) {
+          emailModal.addClass("is-invalid");
+          check = false;
+        }
+
+        if (!newPasswordModal.val()) {
+          newPasswordModal.addClass("is-invalid");
+          check = false;
+        }
+
+        if (!confirmCode.val()) {
+          confirmCode.addClass("is-invalid");
+          check = false;
+        }
+
+        if (check) {
+          const data = {
             email: emailModal.val(),
             password: newPasswordModal.val(),
             code: confirmCode.val(),
-            type: 'FORGOT-PASSWORD'
-        }   
+            type: "FORGOT-PASSWORD",
+          };
 
-        $.ajax({
-          type: "POST",
-          url: `${window.location.origin}/forgot-password`,
-          data: data,
-          withCredentials: true,
-          success: function (data) {
-            liveToast.removeClass("hide");
-            liveToast.addClass("show");
-            btnSendCode.prop("disabled", false);
-            toastBody.text(data.EM);
-            setTimeout(() => {
-              liveToast.removeClass("show");
-              liveToast.addClass("hide");
-            }, 3000);
-          },
-          error: function (request, status, error) {
-            btnSendCode.prop("disabled", false);
-            liveToast.removeClass("hide");
-            liveToast.addClass("show");
-            toastBody.text(error);
-          },
-        });
-      })
+          $.ajax({
+            type: "POST",
+            url: `${window.location.origin}/forgot-password`,
+            data: data,
+            withCredentials: true,
+            success: function (data) {
+              toast.show();
+              btnSendCode.prop("disabled", false);
+              toastBody.text(data.EM);
+
+              if (+data.EC === 0) {
+                window.location.reload();
+              }
+            },
+            error: function (request, status, error) {
+              btnSendCode.prop("disabled", false);
+              toastBody.text(error);
+            },
+          });
+        }
+      });
 
       btnLogin.on("click", function () {
         const isCheckValid = checkValidInputs();
@@ -174,17 +178,31 @@
             withCredentials: true,
             success: function (data) {
               console.log(data);
-              window.location.href = `${redirectURL}/authenticate?ssoToken=${data.code}`;
+              toast.show();
+              window.location.href = `${redirectURL}/authenticate?ssoToken=${data.code}&type=LOCAL`;
             },
             error: function (request, status, error) {
-              showHideElement(liveToast, "show", "hide");
+              toast.show();
               toastBody.text(request.responseJSON.message);
-              setTimeout(() => {
-                showHideElement(liveToast, "hide", "show");
-              }, 3000);
             },
           });
         }
+      });
+
+      btnLoginGoogle.on("click", function () {
+        window.location.href = "/auth/google";
+      });
+
+      btnLoginFacebook.on("click", function () {
+        window.location.href = "/auth/facebook";
+      });
+
+      btnLoginGithub.on("click", function () {
+        window.location.href = "/auth/github";
+      });
+
+      btnLoginDiscord.on("click", function () {
+        window.location.href = "/auth/discord";
       });
     });
   </script>
@@ -195,6 +213,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      padding: 24px;
     "
   >
     <input type="text" id="redirectURL" value="<%= redirectURL %>" hidden />
@@ -233,13 +252,39 @@
             </div>
 
             <div class="mt-3 d-flex flex-column gap-3">
-              <button type="button" class="btn w-100 btn-primary">
+              <button
+                id="btn-login-facebook"
+                type="button"
+                class="btn w-100 btn-primary"
+              >
                 <span>Facebook</span>
                 <i class="bi bi-facebook"></i>
               </button>
-              <button type="button" class="btn w-100 btn-light">
+              <button
+                style="border: 1px solid #eee"
+                id="btn-login-google"
+                type="button"
+                class="btn w-100 btn-light"
+              >
                 <span>Google</span>
                 <i class="bi bi-google"></i>
+              </button>
+              <button
+                id="btn-login-github"
+                type="button"
+                class="btn w-100 btn-dark"
+              >
+                <span>Github</span>
+                <i class="bi bi-github"></i>
+              </button>
+              <button
+                style="background-color: #5865f2; color: #fff"
+                id="btn-login-discord"
+                type="button"
+                class="btn w-100"
+              >
+                <span>Discord</span>
+                <i class="bi bi-discord"></i>
               </button>
             </div>
             <hr />
@@ -253,7 +298,7 @@
     </div>
 
     <!-- Toast message -->
-    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
       <div
         id="liveToast"
         class="toast hide"
@@ -279,6 +324,7 @@
     <!-- Modal -->
 
     <div
+      id="modal"
       class="modal fade"
       id="modal-forgot-password"
       tabindex="-1"
@@ -304,10 +350,14 @@
             </div>
             <div class="mb-3 col-12">
               <label class="form-label">Mật khẩu mới</label>
-              <input id="new-password-modal" type="password" class="form-control" />
+              <input
+                id="new-password-modal"
+                type="password"
+                class="form-control"
+              />
             </div>
             <div class="row">
-              <div class="mb-3 col-3">
+              <div class="mb-3 col-4">
                 <label class="form-label">Mã xác nhận</label>
                 <input
                   id="confirmation-code"
@@ -317,7 +367,7 @@
                   maxlength="6"
                 />
               </div>
-              <div class="mb-3 col-3">
+              <div class="mb-3 col-4">
                 <button
                   id="btn-send-code"
                   style="margin-top: 32px"

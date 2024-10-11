@@ -1,21 +1,22 @@
 require('dotenv').config()
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const GitHubStrategy = require('passport-github2').Strategy;
 const passport = require('passport')
 const { v4: uuidv4 } = require('uuid');
 const socialService = require('../service/socialService')
 
-const configLoginWithGoogle = () => {
-    passport.use(new GoogleStrategy({
-        clientID: process.env.GOOGLE_APP_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_APP_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_APP_REDIRECT_LOGIN
+const configLoginWithGithub = () => {
+    passport.use(new GitHubStrategy({
+        clientID: process.env.GITHUB_APP_CLIENT_ID,
+        clientSecret: process.env.GITHUB_APP_CLIENT_SECRET,
+        callbackURL: process.env.GITHUB_APP_REDIRECT_LOGIN
     },
         async function (accessToken, refreshToken, profile, cb) {
 
             const rawData = {
                 username: profile.displayName,
                 email: profile?.emails[0]?.value,
-                type: 'GOOGLE'
+                address: profile?._json?.location,
+                type: 'GITHUB'
             }
 
             const user = await socialService.findOrInsertProfileSocialToDB(rawData)
@@ -26,5 +27,4 @@ const configLoginWithGoogle = () => {
     ));
 }
 
-
-module.exports = configLoginWithGoogle
+module.exports = configLoginWithGithub

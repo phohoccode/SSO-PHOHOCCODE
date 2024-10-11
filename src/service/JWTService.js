@@ -1,5 +1,6 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken');
+const db = require('../models')
 
 const createJWT = (payload) => {
     let token = null
@@ -17,15 +18,90 @@ const createJWT = (payload) => {
 const verifyToken = (token) => {
     let decoded = null
     try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET)   
+        decoded = jwt.verify(token, process.env.JWT_SECRET)
+    } catch (error) {
+        decoded = 'TokenExpiredError'
+        console.log('TokenExpiredError')
+    }
+    return decoded
+}
+
+const insertTokenToDB = async (email, token, typeAccount) => {
+    try {
+        const rows = await db.Users.update(
+            { refreshToken: token },
+            { where: { email: email, type: typeAccount } }
+        )
+
+        if (rows[0] === 0) {
+            return {
+                EC: -1,
+                EM: 'Thêm token thất bại!'
+            }
+        } 
+
     } catch (error) {
         console.log(error)
-        decoded = 'TokenExpiredError'
+        return res.status(500).json({
+            EC: -1,
+            EM: 'Lỗi không xác định!'
+        })
     }
-    return decoded     
+}
+
+const findUserByToken = async (token) => {
+    try {
+        const user = await db.Users.findOne({
+            where: { refreshToken: token },
+            raw: true
+        })
+
+        if (!user) {
+            return {
+                EC: -1,
+                EM: 'Không tìm thấy người dùng!',
+                DT: ''
+            }
+        }
+
+        return {
+            EC: 0,
+            EM: 'Tìm thấy người dùng!',
+            DT: user
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            EC: -1,
+            EM: 'Lỗi không xác định!'
+        }
+    }
+}
+
+const insertTokenToCookies = (res, accessToken, refreshToken) => {
+    try {
+        res.cookie('refresh_token', refreshToken, {
+            maxAge: +process.env.MAX_AGE_REFRESH_TOKEN,
+            httpOnly: true
+        })
+
+        res.cookie('access_token', accessToken, {
+            maxAge: +process.env.MAX_AGE_ACCESS_TOKEN,
+            httpOnly: true
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            EC: -1,
+            EM: 'Lỗi không xác định!'
+        })
+    }
 }
 
 module.exports = {
     createJWT,
-    verifyToken
+    verifyToken,
+    insertTokenToDB,
+    findUserByToken,
+    insertTokenToCookies
 }

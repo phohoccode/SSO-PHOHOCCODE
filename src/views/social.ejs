@@ -1,0 +1,23 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập với mạng xã hội</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  </head>
+
+  <script>
+    $(document).ready(function () {
+      const ssoToken = $("#ssoToken").val();
+      const redirectURL = $('#redirectURL').val()
+      const type = $('#type').val()
+      window.location.href = `${redirectURL}/authenticate?ssoToken=${ssoToken}&type=${type}`;
+    });
+  </script>
+
+  <body>
+    <input id="ssoToken" hidden type="text" value="<%= ssoToken %>" />
+    <input id="redirectURL" hidden type="text" value="<%= redirectURL %>" />
+    <input id="type" hidden type="text" value="<%= type %>" />
+  </body>
+</html>

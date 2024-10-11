@@ -16,7 +16,8 @@ const checkPassword = (password, hashPassword) => {
 const checkExistEmail = async (emailUser) => {
     try {
         const email = await db.Users.findOne({
-            where: { email: emailUser }
+            where: { email: emailUser, type: 'LOCAL' },
+            raw: true
         })
 
         return email ? true : false
@@ -32,15 +33,30 @@ const checkExistEmail = async (emailUser) => {
 const insertCodeToDB = async (email, code, type) => {
     try {
 
-        await db.VerificationCodes.destroy({
+        const rows = await db.VerificationCodes.destroy({
             where: { email: email, type: type }
         })
 
-        await db.VerificationCodes.create({
-            email: email,
-            code: code,
-            type: type
-        })
+        if (rows >= 1) {
+            const response = await db.VerificationCodes.create({
+                email: email,
+                code: code,
+                type: type
+            })
+
+            if (response?.isNewRecord) {
+                return {
+                    EC: -1,
+                    EM: 'Thêm mã xác thực thất bại!'
+                }
+            }
+
+            return {
+                EC: 0,
+                EM: 'Thêm mã xác thực thành công!'
+            }
+        }
+
     } catch (error) {
         console.log(error)
         return {
@@ -109,10 +125,7 @@ const handleLogin = async (rawData) => {
 
 const handleRegister = async (rawData) => {
     try {
-        const email = await db.Users.findOne({
-            where: { email: rawData.email },
-            raw: true
-        })
+        const email = await checkExistEmail(rawData.email)
 
         if (email) {
             return {
@@ -126,7 +139,6 @@ const handleRegister = async (rawData) => {
             raw: true
         })
 
-
         if (!user || user.code !== rawData.code) {
             return {
                 EC: -1,
@@ -136,7 +148,7 @@ const handleRegister = async (rawData) => {
 
         const hashPassword = hashUserPassword(rawData.password, salt)
 
-        await db.Users.create({
+        const response = await db.Users.create({
             username: rawData.username,
             email: rawData.email,
             password: hashPassword,
@@ -146,6 +158,13 @@ const handleRegister = async (rawData) => {
             address: "",
             type: 'LOCAL'
         })
+
+        if (response?.isNewRecord) {
+            return {
+                EC: 0,
+                EM: 'Đăng ký tài khoản thất bại!',
+            }
+        }
 
         return {
             EC: 0,
@@ -163,8 +182,6 @@ const handleRegister = async (rawData) => {
 const handleResetPassword = async (rawData) => {
     try {
         const isEmailExist = await checkExistEmail(rawData.email)
-
-        console.log('>>> isEmailExist', isEmailExist)
 
         if (!isEmailExist) {
             return {
@@ -188,10 +205,17 @@ const handleResetPassword = async (rawData) => {
 
         const hashPassword = hashUserPassword(rawData.password)
 
-        await db.Users.update(
+        const rows = await db.Users.update(
             { password: hashPassword },
-            { where: {email: rawData.email} }
+            { where: { email: rawData.email } }
         )
+
+        if (rows[0] === 0) {
+            return {
+                EC: -1,
+                EM: 'Thay đổi mật khẩu thất bại!'
+            }
+        }
 
         return {
             EC: 0,
