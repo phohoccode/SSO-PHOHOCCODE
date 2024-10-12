@@ -16,7 +16,8 @@ const sequelize = new Sequelize(
     process.env.DB_CLEVER_CLOUD_USERNAME,
     process.env.DB_CLEVER_CLOUD_PASSWORD, {
     host: process.env.DB_CLEVER_CLOUD_HOST,
-    dialect: process.env.DB_CLEVER_CLOUD_DIALECT
+    // dialect: process.env.DB_CLEVER_CLOUD_DIALECT
+    dialect: "mysql2"
 })
 
 // kiểm tra kết nối
