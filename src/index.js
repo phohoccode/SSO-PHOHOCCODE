@@ -20,7 +20,7 @@ const app = express()
 const PORT = process.env.PORT || 8080
 
 // test kết nối database
-// connection()
+connection()
 
 // config cors
 configCors(app)
