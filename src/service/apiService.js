@@ -29,14 +29,20 @@ const handleUpdateUser = async (rawData) => {
             raw: true
         })
 
-        console.log('>>> user', user)
-
         return {
             EC: 0,
             EC: 'Cập nhật người dùng thành công!',
-            DT: user
+            DT: {
+                username: user.username,
+                email: user.email,
+                address: user.address,
+                type: user.type,
+                gender: user.gender,
+                phoneNumber: user.phoneNumber,
+                refreshToken: user.refreshToken,
+                accessToken: user.accessToken
+            }
         }
-
 
     } catch (error) {
         console.log(error)

@@ -126,7 +126,7 @@ const logout = (req, res, next) => {
         req.logout(function (err) {
             if (err) { return next(err); }
             return res.status(200).json({
-                message: 'Đăng xuất thành công!' // Đã sửa lỗi chính tả
+                message: 'Đăng xuất thành công!'
             });
         });
     } catch (error) {

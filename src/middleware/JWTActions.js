@@ -11,7 +11,7 @@ const verifyJWT = async (req, res, next) => {
     const decoded = JWTService.verifyToken(accessToken)
 
     if (!refreshToken) {
-        return res.status(401).json({
+        return res.status(405).json({
             EC: -1,
             EM: 'Token đã hết hạn. Vui lòng đăng nhập lại!'
         })

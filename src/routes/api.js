@@ -10,7 +10,7 @@ const initApiRoutes = (app) => {
     route.all('*', verifyJWT)
 
     route.get('/logout', authController.logout)
-    route.get('/account', JWTController.getAccount)
+    route.get('/account', apiController.getAccount)
     route.post('/update-user', apiController.updateUser)
 
     return app.use('/api/v1', route)

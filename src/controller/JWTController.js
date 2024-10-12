@@ -57,38 +57,7 @@ const verifySSOToken = async (req, res, next) => {
     }
 }
 
-const getAccount = (req, res, next) => {
-    try {
-
-        if (!req.user) {
-            return res.status(401).json({
-                EC: -1,
-                EM: 'Không tồn tại người dùng'
-            })
-        }
-
-        console.log('>>> req.user', req.user)
-
-        return res.status(200).json({
-            username: req.user.username,
-            email: req.user.email,
-            gender: req.user.gender,
-            phoneNumber: req.user.phoneNumber,
-            address: req.user.address,
-            access_token: req.user.access_token,
-            refresh_token: req.user.refresh_token,
-            type: req.user.type
-        })
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            EC: -1,
-            EM: 'Lỗi không xác định!'
-        })
-    }
-}
 
 module.exports = {
     verifySSOToken,
-    getAccount
 }
