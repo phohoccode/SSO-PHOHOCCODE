@@ -86,7 +86,6 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            domain: "sso-phohoccode.onrender.com"
         });
 
 
@@ -95,7 +94,6 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            domain: "sso-phohoccode.onrender.com"
         });
 
     } catch (error) {
