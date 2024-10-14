@@ -86,7 +86,7 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
             httpOnly: true, 
             secure: false,
             sameSite: 'None',
-            domain: 'http://localhost:3000'
+            domain: 'localhost'
         });
 
        
@@ -95,7 +95,7 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
             httpOnly: true,
             secure: false,
             sameSite: 'None',
-            domain: 'http://localhost:3000'
+            domain: 'localhost'
         });
 
     } catch (error) {
