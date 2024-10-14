@@ -85,7 +85,8 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
             maxAge: +process.env.MAX_AGE_REFRESH_TOKEN,
             httpOnly: true, 
             secure: false,
-            sameSite: 'None'
+            sameSite: 'None',
+            domain: 'http://localhost:3000'
         });
 
        
@@ -93,7 +94,8 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
             maxAge: +process.env.MAX_AGE_ACCESS_TOKEN,
             httpOnly: true,
             secure: false,
-            sameSite: 'None'
+            sameSite: 'None',
+            domain: 'http://localhost:3000'
         });
 
     } catch (error) {
