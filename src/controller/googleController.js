@@ -18,6 +18,8 @@ const configLoginWithGoogle = () => {
                 type: 'GOOGLE'
             }
 
+            console.log('>>> profile google', profile)
+
             const user = await socialService.findOrInsertProfileSocialToDB(rawData)
             user.code = uuidv4()
 
