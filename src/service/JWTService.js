@@ -86,7 +86,7 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            domain: 'sso-frontend-phohoccode.vercel.app'
+            domain: "sso-phohoccode.onrender.com"
         });
 
 
@@ -95,7 +95,7 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            domain: 'sso-frontend-phohoccode.vercel.app'
+            domain: "sso-phohoccode.onrender.com"
         });
 
     } catch (error) {
