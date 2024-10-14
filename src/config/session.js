@@ -8,33 +8,33 @@ const configSession = (app) => {
 
     // Tạo kết nối đến sequelize localhost
 
-    // const sequelize = new Sequelize(
-    //     process.env.DB_NAME,
-    //     process.env.DB_USERNAME,
-    //     process.env.DB_PASSWORD, {
-    //     host: process.env.DB_HOST,
-    //     dialect: process.env.DB_DIALECT,
-    //     logging: false,
-    //     define: {
-    //         freezeTableName: true
-    //     },
-    //     timezone: '+07:00'
-    // })
-
-    // Tạo kết nối đến sequelize clever clound
-    
     const sequelize = new Sequelize(
-        process.env.DB_CLEVER_CLOUD_NAME,
-        process.env.DB_CLEVER_CLOUD_USERNAME,
-        process.env.DB_CLEVER_CLOUD_PASSWORD, {
-        host: process.env.DB_CLEVER_CLOUD_HOST,
-        dialect: process.env.DB_CLEVER_CLOUD_DIALECT,
+        process.env.DB_NAME,
+        process.env.DB_USERNAME,
+        process.env.DB_PASSWORD, {
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT,
         logging: false,
         define: {
             freezeTableName: true
         },
         timezone: '+07:00'
     })
+
+    // Tạo kết nối đến sequelize clever clound
+
+    // const sequelize = new Sequelize(
+    //     process.env.DB_CLEVER_CLOUD_NAME,
+    //     process.env.DB_CLEVER_CLOUD_USERNAME,
+    //     process.env.DB_CLEVER_CLOUD_PASSWORD, {
+    //     host: process.env.DB_CLEVER_CLOUD_HOST,
+    //     dialect: process.env.DB_CLEVER_CLOUD_DIALECT,
+    //     logging: false,
+    //     define: {
+    //         freezeTableName: true
+    //     },
+    //     timezone: '+07:00'
+    // })
 
     // Tạo store để lưu trữ sesstion thông qua Sequelize:
     const myStore = new SequelizeStore({
@@ -51,8 +51,7 @@ const configSession = (app) => {
         expiration: 360,
         cookie: {
             maxAge: 300 * 1000,
-            httpOnly: true,
-            sameSite: 'lax'
+            httpOnly: true
         }
     }));
 
@@ -65,13 +64,16 @@ const configSession = (app) => {
     // Mã hóa: chuyển định dạng user thành dạng có thể lưu trữ trong session
     passport.serializeUser(function (user, cb) {
         process.nextTick(function () {
-            cb(null, user)
+            console.log('>>> Mã hoá:', user)
+            cb(null, user)  
         });
     });
 
     // Giải mã hóa: chuyển định dạng từ session trở lại thành đối tượng user
     passport.deserializeUser(function (user, cb) {
         process.nextTick(function () {
+            console.log('>>> Giãi mã hoá:', user)
+
             return cb(null, user);
         });
     });

@@ -38,7 +38,7 @@ const insertTokenToDB = async (email, token, typeAccount) => {
                 EC: -1,
                 EM: 'Thêm token thất bại!'
             }
-        } 
+        }
 
     } catch (error) {
         console.log(error)
@@ -80,20 +80,22 @@ const findUserByToken = async (token) => {
 
 const insertTokenToCookies = (res, accessToken, refreshToken) => {
     try {
-       
+
         res.cookie('refresh_token', refreshToken, {
             maxAge: +process.env.MAX_AGE_REFRESH_TOKEN,
-            httpOnly: true, 
+            httpOnly: true,
             secure: true,
-            sameSite: 'None'
+            sameSite: 'none',
+            domain: 'sso-frontend-phohoccode.vercel.app'
         });
 
-       
+
         res.cookie('access_token', accessToken, {
             maxAge: +process.env.MAX_AGE_ACCESS_TOKEN,
             httpOnly: true,
             secure: true,
-            sameSite: 'None'
+            sameSite: 'none',
+            domain: 'sso-frontend-phohoccode.vercel.app'
         });
 
     } catch (error) {
