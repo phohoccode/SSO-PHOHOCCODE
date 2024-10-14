@@ -80,15 +80,22 @@ const findUserByToken = async (token) => {
 
 const insertTokenToCookies = (res, accessToken, refreshToken) => {
     try {
+       
         res.cookie('refresh_token', refreshToken, {
             maxAge: +process.env.MAX_AGE_REFRESH_TOKEN,
-            httpOnly: true
-        })
+            httpOnly: true, 
+            secure: false,
+            sameSite: 'None'
+        });
 
+       
         res.cookie('access_token', accessToken, {
             maxAge: +process.env.MAX_AGE_ACCESS_TOKEN,
-            httpOnly: true
-        })
+            httpOnly: true,
+            secure: false,
+            sameSite: 'None'
+        });
+
     } catch (error) {
         console.log(error)
         return res.status(500).json({
