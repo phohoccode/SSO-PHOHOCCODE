@@ -6,35 +6,19 @@ const passport = require('passport')
 const configSession = (app) => {
     const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
-    // Tạo kết nối đến sequelize localhost
 
     const sequelize = new Sequelize(
-        process.env.DB_NAME,
-        process.env.DB_USERNAME,
-        process.env.DB_PASSWORD, {
-        host: process.env.DB_HOST,
-        dialect: process.env.DB_DIALECT,
+        process.env.DB_CLEVER_CLOUD_NAME,
+        process.env.DB_CLEVER_CLOUD_USERNAME,
+        process.env.DB_CLEVER_CLOUD_PASSWORD, {
+        host: process.env.DB_CLEVER_CLOUD_HOST,
+        dialect: process.env.DB_CLEVER_CLOUD_DIALECT,
         logging: false,
         define: {
             freezeTableName: true
         },
         timezone: '+07:00'
     })
-
-    // Tạo kết nối đến sequelize clever clound
-
-    // const sequelize = new Sequelize(
-    //     process.env.DB_CLEVER_CLOUD_NAME,
-    //     process.env.DB_CLEVER_CLOUD_USERNAME,
-    //     process.env.DB_CLEVER_CLOUD_PASSWORD, {
-    //     host: process.env.DB_CLEVER_CLOUD_HOST,
-    //     dialect: process.env.DB_CLEVER_CLOUD_DIALECT,
-    //     logging: false,
-    //     define: {
-    //         freezeTableName: true
-    //     },
-    //     timezone: '+07:00'
-    // })
 
     // Tạo store để lưu trữ sesstion thông qua Sequelize:
     const myStore = new SequelizeStore({
