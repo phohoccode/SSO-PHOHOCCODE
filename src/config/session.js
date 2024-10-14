@@ -35,7 +35,9 @@ const configSession = (app) => {
         expiration: 360,
         cookie: {
             maxAge: 300 * 1000,
-            httpOnly: true
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none'
         }
     }));
 
