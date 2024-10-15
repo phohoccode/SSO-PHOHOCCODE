@@ -12,18 +12,22 @@ const getPageLogin = (req, res) => {
         return res.json({ error: 'Đường dẫn không hợp lệ!' })
     }
 
-    res.cookie('redirectURL', redirectURL, {
-        path: '/',
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none', 
-    });
+    if (!req.cookies.redirectURL) {
+        res.cookie('redirectURL', redirectURL, {
+            path: '/',
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+        });
+    }
+
 
     return res.render('login.ejs', { redirectURL: redirectURL })
 }
 
 const getPageRegister = (req, res) => {
-    return res.render('register.ejs')
+    const redirectURL = req.cookies.redirectURL
+    return res.render('register.ejs', { redirectURL: redirectURL })
 }
 
 const login = async (req, res) => {
