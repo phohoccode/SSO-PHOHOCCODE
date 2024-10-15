@@ -13,9 +13,10 @@ const configLoginWithDiscord = () => {
         clientID: process.env.DISCORD_APP_CLIENT_ID,
         clientSecret: process.env.DISCORD_APP_CLIENT_SECRET,
         callbackURL: process.env.DISCORD_APP_REDIRECT_LOGIN,
-        scope: scopes
+        scope: scopes,
+        passReqToCallback: true
     },
-        async function (accessToken, refreshToken, profile, cb) {
+        async function (req, accessToken, refreshToken, profile, cb) {
 
             const rawData = {
                 username: profile.username,
@@ -25,6 +26,7 @@ const configLoginWithDiscord = () => {
 
             const user = await socialService.findOrInsertProfileSocialToDB(rawData)
             user.code = uuidv4()
+            user.redirectURL = req.cookies?.redirectURL
 
             return cb(null, user)
         }

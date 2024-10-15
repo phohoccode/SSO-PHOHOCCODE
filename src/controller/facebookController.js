@@ -9,9 +9,10 @@ const configLoginWithFacebook = () => {
         clientID: process.env.FACEBOOK_APP_CLIENT_ID,
         clientSecret: process.env.FACEBOOK_APP_CLIENT_SECRET,
         callbackURL: process.env.FACEBOOK_APP_REDIRECT_LOGIN,
-        profileFields: ['id', 'emails', 'name', 'displayName']
+        profileFields: ['id', 'emails', 'name', 'displayName'],
+        passReqToCallback: true
     },
-        async function (accessToken, refreshToken, profile, cb) {
+        async function (req, accessToken, refreshToken, profile, cb) {
 
             const rawData = {
                 username: profile.displayName,
@@ -21,6 +22,7 @@ const configLoginWithFacebook = () => {
 
             const user = await socialService.findOrInsertProfileSocialToDB(rawData)
             user.code = uuidv4()
+            user.redirectURL = req.cookies?.redirectURL
 
             return cb(null, user)
         }

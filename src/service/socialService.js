@@ -19,9 +19,6 @@ const findOrInsertProfileSocialToDB = async (rawData) => {
 
             user = user.dataValues
         }
-
-        console.log('>>> user', user)
-
         return user
     } catch (error) {
         console.log(error)

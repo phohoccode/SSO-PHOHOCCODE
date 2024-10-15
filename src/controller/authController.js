@@ -6,7 +6,20 @@ const fs = require('fs');
 const path = require('path');
 
 const getPageLogin = (req, res) => {
-    return res.render('login.ejs', { redirectURL: process.env.REACT_URL })
+    const redirectURL = req.query?.redirectURL
+
+    if (!authService.isValidRedirectURL(redirectURL)) {
+        return res.json({ error: 'Đường dẫn không hợp lệ!' })
+    }
+
+    res.cookie('redirectURL', redirectURL, {
+        path: '/',
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none', 
+    });
+
+    return res.render('login.ejs', { redirectURL: redirectURL })
 }
 
 const getPageRegister = (req, res) => {

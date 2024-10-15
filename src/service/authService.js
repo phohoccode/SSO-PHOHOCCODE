@@ -1,3 +1,4 @@
+require('dotenv').config()
 const { Op } = require('sequelize');
 const db = require('../models/index')
 const bcrypt = require('bcryptjs');
@@ -247,10 +248,16 @@ const handleResetPassword = async (rawData) => {
     }
 }
 
+const isValidRedirectURL = (redirectURL) => {
+    const listUrl = process.env.REACT_URL.split(',')
+    return listUrl.some(url => url === redirectURL)
+}
+
 module.exports = {
     handleLogin,
     handleRegister,
     insertCodeToDB,
     checkExistEmail,
-    handleResetPassword
+    handleResetPassword,
+    isValidRedirectURL
 }

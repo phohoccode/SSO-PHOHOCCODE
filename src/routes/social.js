@@ -15,7 +15,7 @@ const initSocialRoutes = (app) => {
         function (req, res) {
             return res.render('social.ejs', {
                 ssoToken: req.user.code,
-                redirectURL: process.env.REACT_URL,
+                redirectURL: req.user.redirectURL,
                 type: 'GOOGLE'
             })
         });
@@ -30,7 +30,7 @@ const initSocialRoutes = (app) => {
         function (req, res) {
             return res.render('social.ejs', {
                 ssoToken: req.user.code,
-                redirectURL: process.env.REACT_URL,
+                redirectURL: req.user.redirectURL,
                 type: 'FACEBOOK'
             })
         });
@@ -44,7 +44,7 @@ const initSocialRoutes = (app) => {
         function (req, res) {
             return res.render('social.ejs', {
                 ssoToken: req.user.code,
-                redirectURL: process.env.REACT_URL,
+                redirectURL: req.user.redirectURL,
                 type: 'GITHUB'
             })
         });
@@ -55,7 +55,7 @@ const initSocialRoutes = (app) => {
     }), function (req, res) {
         return res.render('social.ejs', {
             ssoToken: req.user.code,
-            redirectURL: process.env.REACT_URL,
+            redirectURL: req.user.redirectURL,
             type: 'DISCORD'
         })
     });

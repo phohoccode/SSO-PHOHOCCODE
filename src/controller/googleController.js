@@ -8,9 +8,10 @@ const configLoginWithGoogle = () => {
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_APP_CLIENT_ID,
         clientSecret: process.env.GOOGLE_APP_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_APP_REDIRECT_LOGIN
+        callbackURL: process.env.GOOGLE_APP_REDIRECT_LOGIN,
+        passReqToCallback: true
     },
-        async function (accessToken, refreshToken, profile, cb) {
+        async function (req, accessToken, refreshToken, profile, cb) {
 
             const rawData = {
                 username: profile.displayName,
@@ -18,12 +19,11 @@ const configLoginWithGoogle = () => {
                 type: 'GOOGLE'
             }
 
-            console.log('>>> profile google', profile)
+            console.log('>>> req.cookies', req.cookies)
 
             const user = await socialService.findOrInsertProfileSocialToDB(rawData)
-
-            console.log('>>> user', user)
             user.code = uuidv4()
+            user.redirectURL = req.cookies?.redirectURL
 
             return cb(null, user)
         }

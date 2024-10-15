@@ -8,9 +8,10 @@ const configLoginWithGithub = () => {
     passport.use(new GitHubStrategy({
         clientID: process.env.GITHUB_APP_CLIENT_ID,
         clientSecret: process.env.GITHUB_APP_CLIENT_SECRET,
-        callbackURL: process.env.GITHUB_APP_REDIRECT_LOGIN
+        callbackURL: process.env.GITHUB_APP_REDIRECT_LOGIN,
+        passReqToCallback: true
     },
-        async function (accessToken, refreshToken, profile, cb) {
+        async function (req, accessToken, refreshToken, profile, cb) {
 
             const rawData = {
                 username: profile.displayName,
@@ -21,6 +22,7 @@ const configLoginWithGithub = () => {
 
             const user = await socialService.findOrInsertProfileSocialToDB(rawData)
             user.code = uuidv4()
+            user.redirectURL = req.cookies?.redirectURL
 
             return cb(null, user)
         }
