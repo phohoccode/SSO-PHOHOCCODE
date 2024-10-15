@@ -89,6 +89,8 @@ const sendOTP = async (req, res) => {
             html: htmlToSend
         });
 
+        console.log('>>> req.body', req.body)
+
         if (response?.messageId) {
             const response = await authService.insertCodeToDB(req.body.email, OTP, req.body.type)
 

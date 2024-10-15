@@ -39,6 +39,13 @@ const insertCodeToDB = async (email, code, type) => {
 
         console.log('>>> rows', rows)
 
+        if (rows == 0) {
+            return {
+                EC: -1,
+                EM: 'Xoá mã xác thực cũ thất bại!'
+            }
+        }
+
         if (rows >= 1) {
             const response = await db.VerificationCodes.create({
                 email: email,

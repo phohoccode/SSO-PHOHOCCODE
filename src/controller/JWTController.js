@@ -9,7 +9,7 @@ const verifySSOToken = async (req, res, next) => {
         const ssoToken = req.body?.ssoToken
 
         if (req.user?.code !== ssoToken) {
-            return res.status(200).json({
+            return res.status(401).json({
                 EC: -1,
                 EM: 'Token không hợp lệ!'
             })
