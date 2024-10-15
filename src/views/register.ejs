@@ -30,6 +30,7 @@
       const password = $("#password");
       const confirmationCode = $("#confirmation-code");
       const gender = $("#gender");
+      const redirectURL = $("#redirectURL").val();
       const btnSendCode = $("#btn-send-code");
       const btnRegister = $("#btn-register");
       const toastBody = $("#toast-body");
@@ -125,7 +126,7 @@
             success: function (data) {
               console.log(data);
               if (+data.EC === 0) {
-                window.location.href = `${window.location.origin}/login`;
+                window.location.href = `${window.location.origin}/login?redirectURL=${redirectURL}`;
               }
             },
             error: function (request, status, error) {
@@ -148,6 +149,7 @@
       padding: 24px;
     "
   >
+    <input type="text" id="redirectURL" value="<%= redirectURL %>" hidden />
     <div style="max-width: 640px">
       <div class="row">
         <fieldset class="border rounded-3 p-3">
