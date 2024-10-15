@@ -37,6 +37,8 @@ const insertCodeToDB = async (email, code, type) => {
             where: { email: email, type: type }
         })
 
+        console.log('>>> rows', rows)
+
         if (rows >= 1) {
             const response = await db.VerificationCodes.create({
                 email: email,

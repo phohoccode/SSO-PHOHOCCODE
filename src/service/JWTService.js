@@ -84,16 +84,16 @@ const insertTokenToCookies = (res, accessToken, refreshToken) => {
         res.cookie('refresh_token', refreshToken, {
             maxAge: +process.env.MAX_AGE_REFRESH_TOKEN,
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            // secure: true,
+            // sameSite: 'none',
         });
 
 
         res.cookie('access_token', accessToken, {
             maxAge: +process.env.MAX_AGE_ACCESS_TOKEN,
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            // secure: true,
+            // sameSite: 'none',
         });
 
     } catch (error) {

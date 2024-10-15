@@ -13,11 +13,11 @@ const db = {};
 
 
 const sequelize = new Sequelize(
-    process.env.DB_CLEVER_CLOUD_NAME,
-    process.env.DB_CLEVER_CLOUD_USERNAME,
-    process.env.DB_CLEVER_CLOUD_PASSWORD, {
-    host: process.env.DB_CLEVER_CLOUD_HOST,
-    dialect: process.env.DB_CLEVER_CLOUD_DIALECT,
+    process.env.DB_NAME,
+    process.env.DB_USERNAME,
+    process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
     logging: false,
     define: {
         freezeTableName: true

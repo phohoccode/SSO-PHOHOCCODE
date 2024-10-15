@@ -33,5 +33,5 @@ const findOrInsertProfileSocialToDB = async (rawData) => {
 }
 
 module.exports = {
-    findOrInsertProfileSocialToDB
+    findOrInsertProfileSocialToDB,
 }

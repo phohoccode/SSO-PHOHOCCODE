@@ -92,6 +92,8 @@ const sendOTP = async (req, res) => {
         if (response?.messageId) {
             const response = await authService.insertCodeToDB(req.body.email, OTP, req.body.type)
 
+            console.log('>>> response', response)
+
             if (+response.EC !== 0) {
                 return res.status(401).json({
                     EC: response.EC,

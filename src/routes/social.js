@@ -1,9 +1,8 @@
 require('dotenv').config()
 const express = require('express')
 const passport = require('passport')
+
 const route = express.Router()
-const googleController = require('../controller/googleController')
-const facebookController = require('../controller/facebookController')
 
 const initSocialRoutes = (app) => {
 

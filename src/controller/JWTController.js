@@ -7,8 +7,6 @@ const verifySSOToken = async (req, res, next) => {
     try {
 
         const ssoToken = req.body?.ssoToken
-        console.log('>>> ssoToken', ssoToken)
-        console.log('>>> req.user', req.user)
 
         if (req.user?.code !== ssoToken) {
             return res.status(200).json({
