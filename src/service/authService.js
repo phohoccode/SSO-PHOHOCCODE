@@ -33,20 +33,11 @@ const checkExistEmail = async (emailUser) => {
 const insertCodeToDB = async (email, code, type) => {
     try {
 
-        const rows = await db.VerificationCodes.destroy({
+        const user = await db.VerificationCodes.findOne({
             where: { email: email, type: type }
         })
 
-        console.log('>>> rows', rows)
-
-        if (rows == 0) {
-            return {
-                EC: -1,
-                EM: 'Xoá mã xác thực cũ thất bại!'
-            }
-        }
-
-        if (rows >= 1) {
+        if (!user) {
             const response = await db.VerificationCodes.create({
                 email: email,
                 code: code,
@@ -58,11 +49,28 @@ const insertCodeToDB = async (email, code, type) => {
                     EC: -1,
                     EM: 'Thêm mã xác thực thất bại!'
                 }
+            } else {
+                return {
+                    EC: 0,
+                    EM: 'Thêm mã xác thực thành công!'
+                }
             }
+        }
 
+        const rows = await db.VerificationCodes.update(
+            { code: code },
+            {where: {email: email, type: type}}
+        )
+
+        if (rows[0] > 0) {
             return {
                 EC: 0,
-                EM: 'Thêm mã xác thực thành công!'
+                EM: 'Cập nhật mã thành công!'
+            }
+        } else {
+            return {
+                EC: -1,
+                EM: 'Cập nhật mã thất bại!'
             }
         }
 
